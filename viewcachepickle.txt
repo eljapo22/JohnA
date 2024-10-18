@@ -1,0 +1,10 @@
+   import pickle
+
+   # Replace with your actual file path
+   file_path = r"C:\Users\eljapo22\gephi\node2edge_cache.pkl"
+
+   with open(file_path, 'rb') as file:
+       cache_data = pickle.load(file)
+
+   # Print or inspect the data
+   print(cache_data)

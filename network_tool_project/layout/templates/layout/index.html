@@ -1,0 +1,51 @@
+<!-- layout/templates/layout/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Network Layout Tool</title>
+    <link rel="stylesheet" href="{% static 'layout/css/styles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.1/fabric.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to the Interactive Network Layout Tool</h1>
+    <div id="tools">
+        <button onclick="addNode('substation', 'DS Substation: AA')">Add Substation</button>
+        <button onclick="addTransformer('overhead', 'Overhead Transformer')">Add Overhead Transformer</button>
+        <button onclick="addTransformer('ground', 'Ground Transformer')">Add Ground Transformer</button>
+        <button onclick="setDrawMode('primary-L1')">Draw Primary Line L1 (Thick Black)</button>
+        <button onclick="setDrawMode('primary-L2')">Draw Primary Line L2 (Thick Red)</button>
+        <button onclick="setDrawMode('primary-L3')">Draw Primary Line L3 (Thick SkyBlue)</button>
+        <button onclick="setDrawMode('secondary-L1')">Draw Secondary Line L1 (Thin Black)</button>
+        <button onclick="setDrawMode('secondary-L2')">Draw Secondary Line L2 (Thin Red)</button>
+        <button onclick="setDrawMode('secondary-L3')">Draw Secondary Line L3 (Thin SkyBlue)</button>
+        <button onclick="setSelectionMode()">Selection Mode</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+        <button onclick="saveLayout()">Save Layout</button>
+        <button onclick="document.getElementById('fileInput').click()">Load Layout</button>
+        <button onclick="clearLayout()">Clear Layout</button>
+        <button onclick="addCustomText()">Add Custom Text</button>
+        <input type="file" id="fileInput" style="display:none" onchange="loadLayout(this)">
+    </div>
+    <div class="network" id="network">
+        <div class="grid"></div>
+    </div>
+    <textarea id="output" readonly></textarea>
+    <button onclick="downloadLayout()">Download Layout</button>
+    <div class="tooltip" id="tooltip"></div>
+    <div id="legend">
+        <h3>Legend</h3>
+        <p><strong>Substation:</strong> DS Substation: AA</p>
+        <p><strong>Feeders:</strong> DS Feeder: 11</p>
+        <p><strong>Transformers:</strong> DS T/F: BB, DS T/F: CC</p>
+        <p><strong>Areas:</strong> Area: MM, Area: KK</p>
+        <p><strong>Consumers:</strong> 113, 121, etc.</p>
+        <p><strong>Phase Indicators:</strong> L1 (Phase 1), L2 (Phase 2), L3 (Phase 3)</p>
+        <p><strong>Measurements:</strong> kWh (kilowatt-hour), V (voltage), A (current), kW (kilowatt)</p>
+        <p><strong>Energy Consumed:</strong> Energy Consumed: kWh</p>
+        <p><strong>Outgoing Energy:</strong> O/G Energy: kWh</p>
+    </div>
+    <script src="{% static 'layout/js/script.js' %}"></script>
+</body>
+</html>

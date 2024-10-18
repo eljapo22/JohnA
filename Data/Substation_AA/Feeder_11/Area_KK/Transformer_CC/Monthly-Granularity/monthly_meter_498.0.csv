@@ -1,0 +1,2 @@
+CreatedDate,KWH,KVAH,RPhaseVoltage,YPhaseVoltage,BPhaseVoltage,RPhaseCurrent,YPhaseCurrent,BPhaseCurrent,ActivePower,ReactivePower,ApparentPower,TotalPowerFactor,Frequency,MaximumDemandKW,MaximumDemandKVA
+2024-01-01,17571.923000000003,17999.824999999997,225.1280696,236.2132332,224.7790535,3.2230995035614076,1.13,1.465,1.02,294.9037709230034,1.04,0.9317502355,49.8848189,0.5,0.5

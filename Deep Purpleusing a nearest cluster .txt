@@ -1,0 +1,59 @@
+Deep Purple/using a nearest cluster algorithm to assign Areas for each of the clusters of meter (ex Area 
+
+bottom purple Transformer 
+DS TF BB
+
+
+
+bottom purple Transformer 
+Node ID: 961011153
+Coordinates: (-79.3475, 43.6674)
+Type: Transformer
+
+
+m closest 2 transformer
+Node ID: 961011152
+Coordinates: (-79.3472, 43.6671)
+Clusters and colors loaded
+
+m 2nd closest 
+Node ID: 31258725
+Coordinates: (-79.3470, 43.6667)
+Clusters and colors loaded
+
+m furthest from transformer
+Node ID: 3252904691
+Coordinates: (-79.3453, 43.6671)
+
+=======================================
+
+
+Top transformer
+DS TF CC
+
+
+Top transformer
+Node ID: 502815960
+Coordinates: (-79.3478, 43.6686)
+Type: Transformer
+Clusters and colors loaded
+
+
+
+
+m closest 2 transformer
+
+Node ID: 11359207137
+Coordinates: (-79.3480, 43.6689)
+Clusters and colors loaded
+
+
+m closest 2 transformer
+Node ID: 11359207136
+Coordinates: (-79.3479, 43.6690)
+Clusters and colors loaded
+
+m furthest from transformer
+Node ID: 71723092
+Coordinates: (-79.3501, 43.6660)
+Clusters and colors loaded

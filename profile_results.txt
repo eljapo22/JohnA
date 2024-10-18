@@ -1,0 +1,18 @@
+         8149429 function calls (8148259 primitive calls) in 525.202 seconds
+
+   Ordered by: cumulative time
+   List reduced from 635 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      2/1    0.000    0.000  525.200  525.200 C:\Python312\Lib\site-packages\dash\dash.py:2276(run_server)
+      2/1    0.000    0.000  525.200  525.200 C:\Python312\Lib\site-packages\dash\dash.py:1981(run)
+        1    0.000    0.000  525.200  525.200 C:\Python312\Lib\site-packages\flask\app.py:509(run)
+        1    0.000    0.000  525.197  525.197 C:\Python312\Lib\site-packages\werkzeug\serving.py:951(run_simple)
+        1    0.000    0.000  525.173  525.173 C:\Python312\Lib\site-packages\werkzeug\_reloader.py:431(run_with_reloader)
+        1    0.000    0.000  525.173  525.173 C:\Python312\Lib\site-packages\werkzeug\_reloader.py:266(restart_with_reloader)
+        1    0.000    0.000  525.173  525.173 C:\Python312\Lib\subprocess.py:381(call)
+        1    0.002    0.002  525.167  525.167 C:\Python312\Lib\subprocess.py:1259(wait)
+        2    0.232    0.116  466.210  233.105 C:\Python312\Lib\subprocess.py:1580(_wait)
+  991/111  492.570    0.497   55.330    0.498 {built-in method time.sleep}
+
+

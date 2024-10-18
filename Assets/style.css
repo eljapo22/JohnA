@@ -1,0 +1,30 @@
+.diagram-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+}
+
+.diagram-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.diagram-button {
+    display: inline-block;
+    cursor: move;
+    padding: 5px 10px;
+    margin: 5px;
+    background-color: rgba(173, 216, 230, 0.7);
+    border: 2px solid #4682B4;
+    border-radius: 3px;
+    user-select: none;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.diagram-button:hover {
+    background-color: rgba(173, 216, 230, 0.9);
+    box-shadow: 0 0 5px rgba(70, 130, 180, 0.5);
+}

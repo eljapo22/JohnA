@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Network Layout Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .network {
+            position: relative;
+            width: 1200px;
+            height: 1200px;
+            border: 1px solid #000;
+            margin-bottom: 20px;
+        }
+        .node {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .substation {
+            background-color: red;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+        .transformer {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid blue;
+        }
+        .overhead-transformer {
+            border-bottom: 20px solid grey;
+        }
+        .ground-transformer {
+            border-bottom: 20px solid skyblue;
+        }
+        .line {
+            position: absolute;
+            transform-origin: top left;
+            cursor: pointer;
+        }
+        .primary-L1 {
+            border: 2px solid black;
+        }
+        .primary-L2 {
+            border: 2px solid red;
+        }
+        .primary-L3 {
+            border: 2px solid skyblue;
+        }
+        .secondary-L1 {
+            border: 1px solid black;
+        }
+        .secondary-L2 {
+            border: 1px solid red;
+        }
+        .secondary-L3 {
+            border: 1px solid skyblue;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            visibility: hidden;
+        }
+        .label, .line-label {
+            position: absolute;
+            background-color: white;
+            color: black;
+            padding: 2px 5px;
+            border: 1px solid black;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        #tools {
+            margin-bottom: 20px;
+        }
+        #legend {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+            background-color: #f9f9f9;
+        }
+        button {
+            margin-right: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tools">
+        <button onclick="addNode('substation', 'DS Substation: AA')">Add Substation</button>
+        <button onclick="addTransformer('overhead', 'Overhead Transformer')">Add Overhead Transformer</button>
+        <button onclick="addTransformer('ground', 'Ground Transformer')">Add Ground Transformer</button>
+        <button onclick="setDrawMode('primary-L1')">Draw Primary Line L1 (Thick Black)</button>
+        <button onclick="setDrawMode('primary-L2')">Draw Primary Line L2 (Thick Red)</button>
+        <button onclick="setDrawMode('primary-L3')">Draw Primary Line L3 (Thick SkyBlue)</button>
+        <button onclick="setDrawMode('secondary-L1')">Draw Secondary Line L1 (Thin Black)</button>
+        <button onclick="setDrawMode('secondary-L2')">Draw Secondary Line L2 (Thin Red)</button>
+        <button onclick="setDrawMode('secondary-L3')">Draw Secondary Line L3 (Thin SkyBlue)</button>
+        <button onclick="setSelectionMode()">Selection Mode</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+        <button onclick="copySelected()">Copy Selected</button>
+        <button onclick="saveLayout()">Save Layout</button>
+        <button onclick="document.getElementById('fileInput').click()">Load Layout</button>
+        <button onclick="clearLayout()">Clear Layout</button>
+        <input type="file" id="fileInput" style="display:none" onchange="loadLayout(this)">
+        <input type="text" id="customTextInput" placeholder="Enter custom text">
+        <button onclick="addCustomText()">Add Custom Text</button>
+    </div>
+    <div class="network" id="network"></div>
+    <textarea id="output" readonly></textarea>
+    <button onclick="downloadLayout()">Download Layout</button>
+    <div class="tooltip" id="tooltip"></div>
+
+    <div id="legend">
+        <h3>Legend</h3>
+        <p><strong>Substation:</strong> DS Substation: AA</p>
+        <p><strong>Feeders:</strong> DS Feeder: 11</p>
+        <p><strong>Transformers:</strong> DS T/F: BB, DS T/F: CC</p>
+        <p><strong>Areas:</strong> Area: MM, Area: KK</p>
+        <p><strong>Consumers:</strong> 113, 121, etc.</p>
+        <p><strong>Phase Indicators:</strong> L1 (Phase 1), L2 (Phase 2), L3 (Phase 3)</p>
+        <p><strong>Measurements:</strong> kWh (kilowatt-hour), V (voltage), A (current), kW (kilowatt)</p>
+        <p><strong>Energy Consumed:</strong> Energy Consumed: kWh</p>
+        <p><strong>Outgoing Energy:</strong> O/G Energy: kWh</p>
+    </div>
+
+    <script>
+        let nodes = [];
+        let lines = [];
+        let selectedNode = null;
+        let drawingLine = false;
+        let lineType = '';
+        let selectedObject = null;
+        let mode = 'selection'; // Mode can be 'selection' or 'drawing'
+        const snapRange = 20; // Snap range in pixels
+
+        function addNode(type, labelText, left = '100px', top = '100px') {
+            const network = document.getElementById('network');
+            const node = document.createElement('div');
+            node.className = `node ${type}`;
+            node.style.left = left;
+            node.style.top = top;
+            node.draggable = true;
+            node.ondragstart = dragStart;
+            node.ondragend = dragEnd;
+            node.onclick = selectObject;
+            node.onmouseover = showTooltip;
+            node.onmouseout = hideTooltip;
+            network.appendChild(node);
+            nodes.push(node);
+
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.innerText = labelText;
+            label.style.left = `${parseInt(node.style.left) + 25}px`;
+            label.style.top = `${parseInt(node.style.top)}px`;
+            network.appendChild(label);
+
+            node.dataset.label = labelText;
+        }
+
+        function addTransformer(type, labelText, left, top) {
+            addNode(`transformer ${type}-transformer`, labelText, left, top);
+        }
+
+        function dragStart(event) {
+            event.dataTransfer.setData('text/plain', null);
+        }
+
+        function dragEnd(event) {
+            const node = event.target;
+            node.style.left = `${event.pageX - node.offsetWidth / 2}px`;
+            node.style.top = `${event.pageY - node.offsetHeight / 2}px`;
+            const label = Array.from(document.querySelectorAll('.label')).find(l => l.innerText === node.dataset.label);
+            if (label) {
+                label.style.left = `${parseInt(node.style.left) + 25}px`;
+                label.style.top = `${parseInt(node.style.top)}px`;
+            }
+        }
+
+        function selectObject(event) {
+            event.stopPropagation(); // Prevent event bubbling
+            if (mode === 'drawing') {
+                if (selectedNode) {
+                    const node1 = selectedNode;
+                    const node2 = getSnappedNode(event.target);
+                    if (node1 !== node2) {
+                        drawLineBetweenNodes(node1, node2);
+                        selectedNode = null;
+                        drawingLine = false;
+                        mode = 'selection'; // Switch back to selection mode after drawing
+                    }
+                } else {
+                    selectedNode = getSnappedNode(event.target);
+                }
+            } else if (mode === 'selection') {
+                if (selectedObject) {
+                    selectedObject.style.outline = '';
+                }
+                selectedObject = getSnappedNode(event.target);
+                selectedObject.style.outline = '2px solid yellow';
+            }
+        }
+
+        function setDrawMode(type) {
+            drawingLine = true;
+            lineType = type;
+            mode = 'drawing';
+            if (selectedObject) {
+                selectedObject.style.outline = '';
+                selectedObject = null;
+            }
+        }
+
+        function setSelectionMode() {
+            mode = 'selection';
+            drawingLine = false;
+            selectedNode = null;
+            if (selectedObject) {
+                selectedObject.style.outline = '';
+                selectedObject = null;
+            }
+        }
+
+        function drawLineBetweenNodes(node1, node2) {
+            const line = document.createElement('div');
+            line.className = `line ${lineType}`;
+
+            // Offset for stacking lines
+            const offset = 15; // Adjusted offset for better spacing
+            const offsetIndex = lines.filter(line => line.from === node1 && line.to === node2).length;
+
+            const x1 = parseInt(node1.style.left) + node1.offsetWidth / 2 + offsetIndex * offset - offset / 2;
+            const y1 = parseInt(node1.style.top) + node1.offsetHeight / 2;
+            const x2 = parseInt(node2.style.left) + node2.offsetWidth / 2 + offsetIndex * offset - offset / 2;
+            const y2 = parseInt(node2.style.top) + node2.offsetHeight / 2;
+            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            line.style.width = length + 'px';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.left = `${x1}px`;
+            line.style.top = `${y1}px`;
+            line.onclick = selectObject;
+            document.getElementById('network').appendChild(line);
+            lines.push({ from: node1, to: node2, element: line });
+
+            // Add line label
+            addLineLabel(line, offsetIndex);
+        }
+
+        function addLineLabel(line, offsetIndex) {
+            const label = document.createElement('div');
+            label.className = 'line-label';
+            label.innerText = lineType.split('-')[1];
+            label.style.left = `${parseInt(line.style.left) + offsetIndex * 15}px`;
+            label.style.top = `${parseInt(line.style.top) - 15}px`;
+            document.getElementById('network').appendChild(label);
+        }
+
+        function getSnappedNode(targetNode) {
+            let closestNode = targetNode;
+            let minDistance = Infinity;
+            const targetRect = targetNode.getBoundingClientRect();
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+
+            nodes.forEach(node => {
+                const nodeRect = node.getBoundingClientRect();
+                const nodeCenterX = nodeRect.left + nodeRect.width / 2;
+                const nodeCenterY = nodeRect.top + nodeRect.height / 2;
+                const distance = Math.sqrt((nodeCenterX - targetCenterX) ** 2 + (nodeCenterY - targetCenterY) ** 2);
+
+                if (distance < snapRange && distance < minDistance) {
+                    closestNode = node;
+                    minDistance = distance;
+                }
+            });
+
+            return closestNode;
+        }
+
+        function showTooltip(event) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerText = event.target.dataset.label;
+            tooltip.style.left = `${event.pageX + 10}px`;
+            tooltip.style.top = `${event.pageY + 10}px`;
+            tooltip.style.visibility = 'visible';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.visibility = 'hidden';
+        }
+
+        function deleteSelected() {
+            if (selectedObject) {
+                if (selectedObject.classList.contains('line') || selectedObject.classList.contains('line-label')) {
+                    selectedObject.remove();
+                    lines = lines.filter(line => line.element !== selectedObject);
+                } else if (selectedObject.classList.contains('node') || selectedObject.classList.contains('label')) {
+                    selectedObject.remove();
+                    nodes = nodes.filter(node => node !== selectedObject);
+                    lines = lines.filter(line => {
+                        if (line.from === selectedObject || line.to === selectedObject) {
+                            line.element.remove();
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+                selectedObject = null;
+            }
+        }
+
+        function copySelected() {
+            if (selectedObject) {
+                const clone = selectedObject.cloneNode(true);
+                clone.style.left = `${parseInt(selectedObject.style.left) + 20}px`;
+                clone.style.top = `${parseInt(selectedObject.style.top) + 20}px`;
+                document.getElementById('network').appendChild(clone);
+                if (selectedObject.classList.contains('line') || selectedObject.classList.contains('line-label')) {
+                    lines.push({ ...lines.find(line => line.element === selectedObject), element: clone });
+                } else if (selectedObject.classList.contains('node')) {
+                    nodes.push(clone);
+                    clone.ondragstart = dragStart;
+                    clone.ondragend = dragEnd;
+                    clone.onclick = selectObject;
+                    clone.onmouseover = showTooltip;
+                    clone.onmouseout = hideTooltip;
+                } else if (selectedObject.classList.contains('label')) {
+                    nodes.push(clone);
+                    clone.onclick = selectObject;
+                }
+                selectedObject = clone;
+                selectedObject.style.outline = '2px solid yellow';
+            }
+        }
+
+        function addCustomText() {
+            const text = document.getElementById('customTextInput').value;
+            if (text) {
+                const network = document.getElementById('network');
+                const label = document.createElement('div');
+                label.className = 'label';
+                label.innerText = text;
+                label.style.left = '100px';
+                label.style.top = '100px';
+                label.draggable = true;
+                label.ondragstart = dragStart;
+                label.ondragend = dragEnd;
+                label.onclick = selectObject;
+                network.appendChild(label);
+                nodes.push(label);
+                document.getElementById('customTextInput').value = '';
+            }
+        }
+
+        function saveLayout() {
+            const layout = { nodes: [], lines: [] };
+            nodes.forEach(node => {
+                layout.nodes.push({
+                    type: node.classList.contains('substation') ? 'substation' : 
+                           (node.classList.contains('overhead-transformer') ? 'overhead-transformer' : 
+                           (node.classList.contains('ground-transformer') ? 'ground-transformer' : 'label')),
+                    left: node.style.left,
+                    top: node.style.top,
+                    label: node.dataset.label || node.innerText
+                });
+            });
+            lines.forEach(line => {
+                layout.lines.push({
+                    type: line.className,
+                    from: {
+                        left: line.from.style.left,
+                        top: line.from.style.top
+                    },
+                    to: {
+                        left: line.to.style.left,
+                        top: line.to.style.top
+                    }
+                });
+            });
+            document.getElementById('output').value = JSON.stringify(layout, null, 2);
+        }
+
+        function loadLayout(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const layout = JSON.parse(event.target.result);
+                    console.log('Loaded layout:', layout);
+                    clearLayout();
+                    layout.nodes.forEach(node => {
+                        if (node.type === 'substation') {
+                            addNode('substation', node.label, node.left, node.top);
+                        } else if (node.type.includes('transformer')) {
+                            const transformerType = node.type.includes('overhead') ? 'overhead' : 'ground';
+                            addTransformer(transformerType, node.label, node.left, node.top);
+                        } else if (node.type === 'label') {
+                            const customLabel = document.createElement('div');
+                            customLabel.className = 'label';
+                            customLabel.innerText = node.label;
+                            customLabel.style.left = node.left;
+                            customLabel.style.top = node.top;
+                            customLabel.draggable = true;
+                            customLabel.ondragstart = dragStart;
+                            customLabel.ondragend = dragEnd;
+                            customLabel.onclick = selectObject;
+                            document.getElementById('network').appendChild(customLabel);
+                            nodes.push(customLabel);
+                        }
+                    });
+                    layout.lines.forEach(line => {
+                        const node1 = nodes.find(node => node.style.left === line.from.left && node.style.top === line.from.top);
+                        const node2 = nodes.find(node => node.style.left === line.to.left && node.style.top === line.to.top);
+                        if (node1 && node2) {
+                            drawLineBetweenNodes(node1, node2);
+                        }
+                    });
+                    console.log('Layout loaded successfully');
+                } catch (error) {
+                    console.error('Error loading layout:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadLayout() {
+            const layout = document.getElementById('output').value;
+            const blob = new Blob([layout], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'network_layout.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearLayout() {
+            document.getElementById('network').innerHTML = '';
+            nodes = [];
+            lines = [];
+            document.getElementById('output').value = '';
+        }
+    </script>
+</body>
+</html>

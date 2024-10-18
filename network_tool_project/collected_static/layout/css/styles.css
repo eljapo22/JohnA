@@ -1,0 +1,106 @@
+/* layout/static/layout/css/styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+.network {
+    position: relative;
+    width: 1200px;
+    height: 1200px;
+    border: 1px solid #000;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-size: 50px 50px;
+    background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                      linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+}
+.grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+.node {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    cursor: pointer;
+    transform-origin: center;
+}
+.substation {
+    background-color: red;
+}
+.transformer {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid blue;
+}
+.overhead-transformer {
+    border-bottom: 20px solid grey;
+}
+.ground-transformer {
+    border-bottom: 20px solid skyblue;
+}
+.line {
+    position: absolute;
+    transform-origin: top left;
+    cursor: pointer;
+}
+.primary-L1 {
+    border: 2px solid black;
+}
+.primary-L2 {
+    border: 2px solid red;
+}
+.primary-L3 {
+    border: 2px solid skyblue;
+}
+.secondary-L1 {
+    border: 1px solid black;
+}
+.secondary-L2 {
+    border: 1px solid red;
+}
+.secondary-L3 {
+    border: 1px solid skyblue;
+}
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    visibility: hidden;
+}
+.label {
+    position: absolute;
+    background-color: white;
+    color: black;
+    padding: 2px 5px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+#tools {
+    margin-bottom: 20px;
+}
+#legend {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #000;
+    background-color: #f9f9f9;
+}
+button {
+    margin-right: 10px;
+}
+textarea {
+    width: 100%;
+    height: 100px;
+}

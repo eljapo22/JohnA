@@ -1,0 +1,43 @@
+import json
+import networkx as nx
+
+# Load the graph from the cache
+def load_graph_from_cache():
+    with open("C:\\Users\\eljapo22\\gephi\\cache\\7644e20afe6c4a94db3dcb733771bb0d4d5a6fc6.json", 'r') as f:
+        data = json.load(f)
+    G = nx.Graph()
+    node_to_coordinates = {}  # Dictionary to store all nodes and their coordinates
+    
+    # Store all node positions and edges
+    for element in data['elements']:
+        if element['type'] == 'node':
+            G.add_node(element['id'], pos=(element['lon'], element['lat']))
+            node_to_coordinates[element['id']] = (element['lon'], element['lat'])
+        elif element['type'] == 'way':
+            for i in range(len(element['nodes']) - 1):
+                G.add_edge(element['nodes'][i], element['nodes'][i + 1])
+                
+    return G, node_to_coordinates
+
+G, node_to_coordinates = load_graph_from_cache()
+
+# Assign the CRS attribute manually
+G.graph['crs'] = {'init': 'epsg:4326'}
+
+# Define the IDs for Substation AA and DS T/F BB
+substation_id = 24959509
+transformer_bb_id = 34404246
+
+# Retrieve all edges that make up the full path from Substation AA to DS T/F BB
+full_path_edges = list(nx.edge_dfs(G, source=substation_id, depth_limit=len(G.edges)))
+
+# Extract the coordinates for these edges
+path_coordinates = []
+for edge in full_path_edges:
+    if edge[1] == transformer_bb_id or edge[0] == transformer_bb_id:
+        break  # Stop when the BB transformer is reached
+    path_coordinates.append((node_to_coordinates[edge[0]], node_to_coordinates[edge[1]]))
+
+# Print all coordinates along this full path
+for coord_pair in path_coordinates:
+    print(f"From {coord_pair[0]} to {coord_pair[1]}")

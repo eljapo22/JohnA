@@ -1,0 +1,3 @@
+CreatedDate,Unnamed: 0,MeterSerialNo,ConsumerID,KVAH,KWH,RPhaseVoltage,YPhaseVoltage,BPhaseVoltage,RPhaseCurrent,YPhaseCurrent,BPhaseCurrent,ActivePower,ReactivePower,ApparentPower,TotalPowerFactor,Frequency,MaximumDemandKW,MaximumDemandKVA
+2024-01-05 12:28:00,10996.0,98.0,127.0,8986.596,8774.145,236.47,238.17,234.62,3.42424778761062,0.27,0.69,0.15,0.06,0.17,0.929,49.922,0.25,0.25
+2024-01-08 19:31:00,10993.0,98.0,127.0,9013.229,8797.778,246.05,248.17,245.19,3.021951219512195,1.99,2.24,0.87,589.6875418460068,0.87,0.997,49.964,0.25,0.25
